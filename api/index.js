@@ -19,7 +19,7 @@ app.get('/payment/success', (req, res) => {
 
     console.log('✅ Payment Success (GET):', { paymentKey, user_id, amount });
 
-    // ✅ Order ID বের করার নতুন নিয়ম
+    // Order ID বের করা
     let orderId = 'N/A';
     if (paymentKey) {
         if (paymentKey.includes('_')) {
@@ -28,6 +28,12 @@ app.get('/payment/success', (req, res) => {
         } else {
             orderId = paymentKey;
         }
+    }
+
+    // ✅ Order ID ছোট করে দেখানো (প্রথম 8 অক্ষর)
+    let displayOrderId = orderId;
+    if (orderId && orderId.length > 8) {
+        displayOrderId = orderId.substring(0, 8) + '...';
     }
 
     const botLink = `https://t.me/CraftlandXfollowersBot?start=verify_${paymentKey}`;
@@ -237,7 +243,7 @@ app.get('/payment/success', (req, res) => {
                         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                         Order ID
                     </span>
-                    <span class="detail-value order-id">${orderId}</span>
+                    <span class="detail-value order-id">${displayOrderId}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">
@@ -453,7 +459,7 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Bot Webhook Server</title>
+        <title>Jubayer Webhook Server</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             body { font-family: Arial; text-align: center; padding: 50px 20px; background: #0a0a0a; color: white; }
