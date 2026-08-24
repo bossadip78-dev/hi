@@ -1,0 +1,12 @@
+{
+  "name": "bohudur-webhook",
+  "version": "1.0.0",
+  "description": "Bohudur payment webhook for Telegram bot",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
