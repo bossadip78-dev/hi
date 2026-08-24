@@ -36,7 +36,7 @@ app.get('/payment/success', (req, res) => {
         displayOrderId = orderId.substring(0, 8) + '...';
     }
 
-    const botLink = `https://t.me/CraftlandXfollowersBot?start=verify_${paymentKey}`;
+    const botLink = `https://t.me/LikeXsellerbot?start=verify_${paymentKey}`;
 
     res.send(`
     <!DOCTYPE html>
