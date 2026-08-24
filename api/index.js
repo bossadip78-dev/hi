@@ -18,7 +18,9 @@ app.get('/payment/success', (req, res) => {
     const user_id = req.query.user_id || req.query.uid || '';
     const amount = req.query.amount || req.query.amt || '';
     
-    // !!! আপনার বটের ইউজারনেম দিয়ে পরিবর্তন করুন !!!
+    // Order ID extract from reference (example: 90TAKA_ODER178750460133f3bb1f_7736277864)
+    const orderId = reference ? reference.split('_')[1] || reference : 'N/A';
+    
     const botLink = `https://t.me/CraftlandXfollowersBot?start=${reference}`;
     
     console.log('✅ Payment Success (GET):', paymentKey);
@@ -50,7 +52,7 @@ app.get('/payment/success', (req, res) => {
                 background: rgba(255,255,255,0.05);
                 border: 1px solid rgba(255,255,255,0.1);
                 border-radius: 20px;
-                padding: 40px;
+                padding: 40px 35px;
                 text-align: center;
                 max-width: 450px;
                 width: 90%;
@@ -72,7 +74,7 @@ app.get('/payment/success', (req, res) => {
             .title {
                 font-size: 28px;
                 font-weight: 700;
-                margin-bottom: 10px;
+                margin-bottom: 6px;
                 background: linear-gradient(135deg, #00ff88, #00cc6a);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
@@ -83,9 +85,13 @@ app.get('/payment/success', (req, res) => {
                 background: linear-gradient(135deg, #FFD700, #FFA500);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-                margin: 15px 0;
+                margin: 8px 0 20px 0;
             }
-            .subtitle { color: #aaa; margin-bottom: 25px; font-size: 14px; }
+            .subtitle {
+                color: #aaa;
+                margin-bottom: 25px;
+                font-size: 14px;
+            }
             .status-badge {
                 display: inline-block;
                 background: rgba(0,255,136,0.15);
@@ -96,16 +102,70 @@ app.get('/payment/success', (req, res) => {
                 font-weight: 600;
                 margin-bottom: 20px;
             }
+            
+            /* ===== PAYMENT DETAILS BOX ===== */
+            .details-box {
+                background: rgba(255,255,255,0.05);
+                border-radius: 12px;
+                padding: 18px 20px;
+                margin-bottom: 25px;
+                text-align: left;
+                border: 1px solid rgba(255,255,255,0.06);
+            }
+            .detail-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+            }
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+            .detail-label {
+                color: #888;
+                font-size: 13px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .detail-label svg {
+                width: 16px;
+                height: 16px;
+                stroke: #00ff88;
+                fill: none;
+                stroke-width: 2;
+            }
+            .detail-value {
+                color: #fff;
+                font-weight: 600;
+                font-size: 13px;
+                word-break: break-all;
+                max-width: 60%;
+                text-align: right;
+                font-family: 'Courier New', monospace;
+            }
+            .detail-value.user-id {
+                color: #00ff88;
+            }
+            .detail-value.amount {
+                color: #FFD700;
+            }
+            .detail-value.order-id {
+                color: #88ccff;
+            }
+
+            /* ===== LOADING BAR ===== */
             .loading-container {
-                margin: 25px 0;
+                margin: 10px 0 20px 0;
             }
             .loading-bar {
                 width: 100%;
-                height: 6px;
-                background: rgba(255,255,255,0.1);
+                height: 4px;
+                background: rgba(255,255,255,0.08);
                 border-radius: 10px;
                 overflow: hidden;
-                margin-top: 10px;
+                margin-top: 8px;
             }
             .loading-progress {
                 height: 100%;
@@ -116,43 +176,108 @@ app.get('/payment/success', (req, res) => {
             }
             .redirect-text {
                 color: #888;
-                font-size: 14px;
-                margin-top: 10px;
+                font-size: 13px;
+                margin-top: 8px;
             }
             .redirect-text span {
                 color: #00ff88;
                 font-weight: 600;
             }
+
+            /* ===== FOOTER WITH GREEN DOT ===== */
+            .footer {
+                margin-top: 25px;
+                padding-top: 18px;
+                border-top: 1px solid rgba(255,255,255,0.06);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            .green-dot {
+                width: 10px;
+                height: 10px;
+                background-color: #00ff88;
+                border-radius: 50%;
+                display: inline-block;
+                animation: blink 1.5s infinite;
+                box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+            }
+            @keyframes blink {
+                0% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.3; transform: scale(0.7); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+            .footer-text {
+                color: #666;
+                font-size: 13px;
+                font-weight: 500;
+                letter-spacing: 0.5px;
+            }
+            .footer-text span {
+                color: #00ff88;
+                font-weight: 600;
+            }
+
             @keyframes scaleIn {
                 from { transform: scale(0); }
                 to { transform: scale(1); }
-            }
-            @keyframes pulse {
-                0% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
-                70% { box-shadow: 0 0 0 20px rgba(0,255,136,0); }
-                100% { box-shadow: 0 0 0 0 rgba(0,255,136,0); }
             }
         </style>
     </head>
     <body oncontextmenu="return false;">
         <div class="container">
+            <!-- Success Icon -->
             <div class="checkmark">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
             </div>
-            <div class="status-badge">✅ Payment Verified</div>
+            
+            <div class="status-badge">Payment Verified</div>
             <h1 class="title">Payment Successful!</h1>
             <div class="amount-display">৳${amount}</div>
             <p class="subtitle">Amount has been added to your balance</p>
             
+            <!-- Payment Details -->
+            <div class="details-box">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5.3 18.3C6.8 16.5 9.2 15 12 15s5.2 1.5 6.7 3.3"/></svg>
+                        User ID
+                    </span>
+                    <span class="detail-value user-id">${user_id || 'N/A'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        Order ID
+                    </span>
+                    <span class="detail-value order-id">${orderId}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Amount
+                    </span>
+                    <span class="detail-value amount">৳${amount}</span>
+                </div>
+            </div>
+            
+            <!-- Loading Bar -->
             <div class="loading-container">
                 <div class="loading-bar">
                     <div class="loading-progress" id="loadingProgress"></div>
                 </div>
                 <p class="redirect-text">
-                    ⏳ Redirecting to bot in <span id="countdown">10</span> seconds...
+                    Redirecting to bot in <span id="countdown">8</span> seconds...
                 </p>
+            </div>
+            
+            <!-- Footer with Green Dot -->
+            <div class="footer">
+                <span class="green-dot"></span>
+                <span class="footer-text"><span>Jubayer</span> Secure Checkout</span>
             </div>
         </div>
         
@@ -161,17 +286,15 @@ app.get('/payment/success', (req, res) => {
             document.addEventListener('copy', e => e.preventDefault());
             
             const botLink = '${botLink}';
-            let countdown = 10;
+            let countdown = 8;
             const countdownEl = document.getElementById('countdown');
             const progressEl = document.getElementById('loadingProgress');
             
-            // Progress bar update function
             function updateProgress() {
-                const progress = ((10 - countdown) / 10) * 100;
+                const progress = ((8 - countdown) / 8) * 100;
                 progressEl.style.width = progress + '%';
             }
             
-            // Initial progress
             updateProgress();
             
             const interval = setInterval(() => {
@@ -286,6 +409,39 @@ app.get('/payment/cancel', (req, res) => {
                 transform: translateY(-2px);
                 box-shadow: 0 10px 20px rgba(0,136,204,0.3);
             }
+            .footer {
+                margin-top: 25px;
+                padding-top: 18px;
+                border-top: 1px solid rgba(255,255,255,0.06);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            .green-dot {
+                width: 10px;
+                height: 10px;
+                background-color: #00ff88;
+                border-radius: 50%;
+                display: inline-block;
+                animation: blink 1.5s infinite;
+                box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+            }
+            @keyframes blink {
+                0% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.3; transform: scale(0.7); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+            .footer-text {
+                color: #666;
+                font-size: 13px;
+                font-weight: 500;
+                letter-spacing: 0.5px;
+            }
+            .footer-text span {
+                color: #00ff88;
+                font-weight: 600;
+            }
             @keyframes scaleIn {
                 from { transform: scale(0); }
                 to { transform: scale(1); }
@@ -300,10 +456,15 @@ app.get('/payment/cancel', (req, res) => {
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </div>
-            <div class="status-badge">❌ Order Cancelled</div>
+            <div class="status-badge">Order Cancelled</div>
             <h1 class="title">Payment Cancelled</h1>
             <p class="subtitle">No charges were made. You can try again anytime.</p>
-            <a href="https://t.me/CraftlandXfollowersBot" class="bot-btn">🤖 Return to Bot</a>
+            <a href="https://t.me/CraftlandXfollowersBot" class="bot-btn">Return to Bot</a>
+            
+            <div class="footer">
+                <span class="green-dot"></span>
+                <span class="footer-text"><span>Jubayer</span> Secure Checkout</span>
+            </div>
         </div>
     </body>
     </html>
