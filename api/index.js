@@ -301,9 +301,8 @@ app.get('/', (req, res) => {
         </style>
     </head>
     <body>
-        <h1>🤖 Fire Like Bot</h1>
+        <h1>🤖 Free Fire Like Bot</h1>
         <p class="status">✅ Jubayer Server Running</p>
-        <p>Time: ${new Date().toLocaleString()}</p>
     </body>
     </html>
     `);
