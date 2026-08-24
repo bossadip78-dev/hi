@@ -137,14 +137,14 @@ app.get('/payment/success', (req, res) => {
             <div class="amount-display">৳${amount}</div>
             <p class="subtitle">Amount has been added to your balance</p>
             <a href="${botLink}" class="claim-btn">🎉 CLAIM BALANCE</a>
-            <p class="auto-redirect">Auto redirect in <span class="countdown" id="countdown">3</span> seconds...</p>
+            <p class="auto-redirect">Auto redirect in <span class="countdown" id="countdown">10</span> seconds...</p>
         </div>
         
         <script>
             document.addEventListener('contextmenu', e => e.preventDefault());
             document.addEventListener('copy', e => e.preventDefault());
             
-            let countdown = 3;
+            let countdown = 10;
             const countdownEl = document.getElementById('countdown');
             
             setInterval(() => {
@@ -302,7 +302,7 @@ app.get('/', (req, res) => {
     </head>
     <body>
         <h1>🤖 Fire Like Bot</h1>
-        <p class="status">✅ Webhook Server Running</p>
+        <p class="status">✅ Jubayer Server Running</p>
         <p>Time: ${new Date().toLocaleString()}</p>
     </body>
     </html>
