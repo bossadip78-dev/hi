@@ -1,4 +1,4 @@
-// api/index.js - Vercel Serverless Function
+// api/index.js - Vercel Serverless Function (Mobile + PC Optimized)
 const express = require('express');
 const app = express();
 app.use(express.json());
@@ -18,7 +18,7 @@ app.get('/payment/success', (req, res) => {
     const user_id = req.query.user_id || req.query.uid || '';
     const amount = req.query.amount || req.query.amt || '';
     
-    // Order ID extract from reference (example: 90TAKA_ODER178750460133f3bb1f_7736277864)
+    // Order ID extract from reference
     const orderId = reference ? reference.split('_')[1] || reference : 'N/A';
     
     const botLink = `https://t.me/CraftlandXfollowersBot?start=${reference}`;
@@ -33,84 +33,106 @@ app.get('/payment/success', (req, res) => {
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>Payment Successful - ৳${amount}</title>
         <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
+            /* ===== RESET & BASE ===== */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
             body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
                 background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
                 min-height: 100vh;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 color: #fff;
+                padding: 16px;
                 -webkit-user-select: none;
                 user-select: none;
+                -webkit-tap-highlight-color: transparent;
             }
+            
+            /* ===== CONTAINER ===== */
             .container {
                 background: rgba(255,255,255,0.05);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 20px;
-                padding: 40px 35px;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 24px;
+                padding: 32px 24px;
                 text-align: center;
-                max-width: 450px;
-                width: 90%;
-                backdrop-filter: blur(10px);
-                box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+                max-width: 420px;
+                width: 100%;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             }
+            
+            /* ===== CHECKMARK ICON ===== */
             .checkmark {
-                width: 80px;
-                height: 80px;
+                width: 72px;
+                height: 72px;
                 background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 auto 25px;
+                margin: 0 auto 20px;
                 animation: scaleIn 0.5s ease;
+                flex-shrink: 0;
             }
-            .checkmark svg { width: 40px; height: 40px; }
+            .checkmark svg {
+                width: 36px;
+                height: 36px;
+            }
+            
+            /* ===== TYPOGRAPHY ===== */
+            .status-badge {
+                display: inline-block;
+                background: rgba(0,255,136,0.12);
+                color: #00ff88;
+                padding: 6px 16px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 0.3px;
+                margin-bottom: 12px;
+            }
             .title {
-                font-size: 28px;
+                font-size: clamp(22px, 5vw, 28px);
                 font-weight: 700;
-                margin-bottom: 6px;
+                margin-bottom: 4px;
                 background: linear-gradient(135deg, #00ff88, #00cc6a);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
             .amount-display {
-                font-size: 42px;
+                font-size: clamp(34px, 8vw, 44px);
                 font-weight: 800;
                 background: linear-gradient(135deg, #FFD700, #FFA500);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-                margin: 8px 0 20px 0;
+                background-clip: text;
+                margin: 6px 0 16px 0;
+                letter-spacing: 1px;
             }
             .subtitle {
                 color: #aaa;
-                margin-bottom: 25px;
-                font-size: 14px;
-            }
-            .status-badge {
-                display: inline-block;
-                background: rgba(0,255,136,0.15);
-                color: #00ff88;
-                padding: 8px 16px;
-                border-radius: 20px;
-                font-size: 13px;
-                font-weight: 600;
+                font-size: clamp(13px, 2.5vw, 15px);
                 margin-bottom: 20px;
             }
             
-            /* ===== PAYMENT DETAILS BOX ===== */
+            /* ===== DETAILS BOX ===== */
             .details-box {
-                background: rgba(255,255,255,0.05);
-                border-radius: 12px;
-                padding: 18px 20px;
-                margin-bottom: 25px;
-                text-align: left;
+                background: rgba(255,255,255,0.04);
+                border-radius: 14px;
+                padding: 16px 18px;
+                margin-bottom: 22px;
                 border: 1px solid rgba(255,255,255,0.06);
+                text-align: left;
             }
             .detail-row {
                 display: flex;
@@ -118,16 +140,22 @@ app.get('/payment/success', (req, res) => {
                 align-items: center;
                 padding: 8px 0;
                 border-bottom: 1px solid rgba(255,255,255,0.05);
+                gap: 12px;
             }
             .detail-row:last-child {
                 border-bottom: none;
+                padding-bottom: 0;
+            }
+            .detail-row:first-child {
+                padding-top: 0;
             }
             .detail-label {
                 color: #888;
-                font-size: 13px;
+                font-size: clamp(12px, 2vw, 13px);
                 display: flex;
                 align-items: center;
                 gap: 8px;
+                flex-shrink: 0;
             }
             .detail-label svg {
                 width: 16px;
@@ -135,29 +163,24 @@ app.get('/payment/success', (req, res) => {
                 stroke: #00ff88;
                 fill: none;
                 stroke-width: 2;
+                flex-shrink: 0;
             }
             .detail-value {
                 color: #fff;
                 font-weight: 600;
-                font-size: 13px;
+                font-size: clamp(12px, 2vw, 13px);
                 word-break: break-all;
-                max-width: 60%;
                 text-align: right;
                 font-family: 'Courier New', monospace;
+                max-width: 65%;
             }
-            .detail-value.user-id {
-                color: #00ff88;
-            }
-            .detail-value.amount {
-                color: #FFD700;
-            }
-            .detail-value.order-id {
-                color: #88ccff;
-            }
-
+            .detail-value.user-id { color: #00ff88; }
+            .detail-value.amount { color: #FFD700; }
+            .detail-value.order-id { color: #88ccff; }
+            
             /* ===== LOADING BAR ===== */
             .loading-container {
-                margin: 10px 0 20px 0;
+                margin: 6px 0 4px 0;
             }
             .loading-bar {
                 width: 100%;
@@ -165,7 +188,6 @@ app.get('/payment/success', (req, res) => {
                 background: rgba(255,255,255,0.08);
                 border-radius: 10px;
                 overflow: hidden;
-                margin-top: 8px;
             }
             .loading-progress {
                 height: 100%;
@@ -176,52 +198,142 @@ app.get('/payment/success', (req, res) => {
             }
             .redirect-text {
                 color: #888;
-                font-size: 13px;
-                margin-top: 8px;
+                font-size: clamp(12px, 2vw, 13px);
+                margin-top: 10px;
             }
             .redirect-text span {
                 color: #00ff88;
                 font-weight: 600;
             }
-
-            /* ===== FOOTER WITH GREEN DOT ===== */
+            
+            /* ===== FOOTER ===== */
             .footer {
-                margin-top: 25px;
-                padding-top: 18px;
+                margin-top: 22px;
+                padding-top: 16px;
                 border-top: 1px solid rgba(255,255,255,0.06);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 gap: 10px;
+                flex-wrap: wrap;
             }
             .green-dot {
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
                 background-color: #00ff88;
                 border-radius: 50%;
                 display: inline-block;
                 animation: blink 1.5s infinite;
-                box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+                box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+                flex-shrink: 0;
             }
             @keyframes blink {
                 0% { opacity: 1; transform: scale(1); }
-                50% { opacity: 0.3; transform: scale(0.7); }
+                50% { opacity: 0.2; transform: scale(0.7); }
                 100% { opacity: 1; transform: scale(1); }
             }
             .footer-text {
                 color: #666;
-                font-size: 13px;
+                font-size: clamp(11px, 2vw, 13px);
                 font-weight: 500;
-                letter-spacing: 0.5px;
+                letter-spacing: 0.3px;
             }
             .footer-text span {
                 color: #00ff88;
                 font-weight: 600;
             }
-
+            
+            /* ===== ANIMATIONS ===== */
             @keyframes scaleIn {
-                from { transform: scale(0); }
-                to { transform: scale(1); }
+                from { transform: scale(0); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            
+            /* ===== RESPONSIVE TWEAKS ===== */
+            @media (max-width: 480px) {
+                .container {
+                    padding: 24px 18px;
+                    border-radius: 20px;
+                }
+                .checkmark {
+                    width: 60px;
+                    height: 60px;
+                    margin-bottom: 16px;
+                }
+                .checkmark svg {
+                    width: 30px;
+                    height: 30px;
+                }
+                .details-box {
+                    padding: 14px 14px;
+                    margin-bottom: 18px;
+                }
+                .detail-row {
+                    padding: 6px 0;
+                }
+                .footer {
+                    margin-top: 18px;
+                    padding-top: 14px;
+                }
+                .green-dot {
+                    width: 7px;
+                    height: 7px;
+                }
+            }
+            
+            @media (max-width: 380px) {
+                .container {
+                    padding: 18px 14px;
+                }
+                .detail-label {
+                    font-size: 11px;
+                }
+                .detail-value {
+                    font-size: 11px;
+                }
+                .detail-label svg {
+                    width: 14px;
+                    height: 14px;
+                }
+            }
+            
+            /* ===== LANDSCAPE MODE ===== */
+            @media (max-height: 600px) and (orientation: landscape) {
+                body {
+                    padding: 12px;
+                }
+                .container {
+                    padding: 18px 20px;
+                    max-width: 380px;
+                }
+                .checkmark {
+                    width: 48px;
+                    height: 48px;
+                    margin-bottom: 12px;
+                }
+                .checkmark svg {
+                    width: 24px;
+                    height: 24px;
+                }
+                .amount-display {
+                    font-size: 30px;
+                    margin: 4px 0 10px 0;
+                }
+                .details-box {
+                    padding: 10px 14px;
+                    margin-bottom: 12px;
+                }
+                .detail-row {
+                    padding: 4px 0;
+                }
+                .footer {
+                    margin-top: 12px;
+                    padding-top: 10px;
+                }
+                .subtitle {
+                    margin-bottom: 12px;
+                    font-size: 12px;
+                }
             }
         </style>
     </head>
@@ -274,7 +386,7 @@ app.get('/payment/success', (req, res) => {
                 </p>
             </div>
             
-            <!-- Footer with Green Dot -->
+            <!-- Footer -->
             <div class="footer">
                 <span class="green-dot"></span>
                 <span class="footer-text"><span>Jubayer</span> Secure Checkout</span>
@@ -339,61 +451,65 @@ app.get('/payment/cancel', (req, res) => {
     <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>Payment Cancelled</title>
         <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
                 background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
                 min-height: 100vh;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 color: #fff;
+                padding: 16px;
                 user-select: none;
+                -webkit-tap-highlight-color: transparent;
             }
             .container {
                 background: rgba(255,255,255,0.05);
-                border: 1px solid rgba(255,255,255,0.1);
-                border-radius: 20px;
-                padding: 40px;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 24px;
+                padding: 32px 24px;
                 text-align: center;
-                max-width: 450px;
-                width: 90%;
-                backdrop-filter: blur(10px);
-                box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+                max-width: 420px;
+                width: 100%;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             }
             .cancel-icon {
-                width: 80px;
-                height: 80px;
+                width: 72px;
+                height: 72px;
                 background: linear-gradient(135deg, #ff4757, #ff6b81);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 auto 25px;
+                margin: 0 auto 20px;
                 animation: scaleIn 0.5s ease;
             }
-            .cancel-icon svg { width: 40px; height: 40px; }
+            .cancel-icon svg { width: 36px; height: 36px; }
             .title {
-                font-size: 28px;
+                font-size: clamp(22px, 5vw, 28px);
                 font-weight: 700;
-                margin-bottom: 10px;
+                margin-bottom: 6px;
                 background: linear-gradient(135deg, #ff4757, #ff6b81);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
+                background-clip: text;
             }
-            .subtitle { color: #aaa; margin-bottom: 25px; font-size: 14px; }
+            .subtitle { color: #aaa; font-size: clamp(13px, 2.5vw, 15px); margin-bottom: 22px; }
             .status-badge {
                 display: inline-block;
-                background: rgba(255,71,87,0.15);
+                background: rgba(255,71,87,0.12);
                 color: #ff4757;
-                padding: 8px 16px;
+                padding: 6px 16px;
                 border-radius: 20px;
-                font-size: 13px;
+                font-size: 12px;
                 font-weight: 600;
-                margin-bottom: 20px;
+                margin-bottom: 12px;
             }
             .bot-btn {
                 display: inline-block;
@@ -403,48 +519,53 @@ app.get('/payment/cancel', (req, res) => {
                 border-radius: 25px;
                 text-decoration: none;
                 font-weight: 600;
+                font-size: clamp(14px, 2.5vw, 16px);
                 transition: all 0.3s;
+                -webkit-tap-highlight-color: transparent;
             }
-            .bot-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 20px rgba(0,136,204,0.3);
+            .bot-btn:active {
+                transform: scale(0.95);
             }
             .footer {
-                margin-top: 25px;
-                padding-top: 18px;
+                margin-top: 22px;
+                padding-top: 16px;
                 border-top: 1px solid rgba(255,255,255,0.06);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 gap: 10px;
+                flex-wrap: wrap;
             }
             .green-dot {
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
                 background-color: #00ff88;
                 border-radius: 50%;
                 display: inline-block;
                 animation: blink 1.5s infinite;
-                box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+                box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+                flex-shrink: 0;
             }
             @keyframes blink {
                 0% { opacity: 1; transform: scale(1); }
-                50% { opacity: 0.3; transform: scale(0.7); }
+                50% { opacity: 0.2; transform: scale(0.7); }
                 100% { opacity: 1; transform: scale(1); }
             }
             .footer-text {
                 color: #666;
-                font-size: 13px;
+                font-size: clamp(11px, 2vw, 13px);
                 font-weight: 500;
-                letter-spacing: 0.5px;
+                letter-spacing: 0.3px;
             }
-            .footer-text span {
-                color: #00ff88;
-                font-weight: 600;
-            }
+            .footer-text span { color: #00ff88; font-weight: 600; }
             @keyframes scaleIn {
-                from { transform: scale(0); }
-                to { transform: scale(1); }
+                from { transform: scale(0); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            @media (max-width: 480px) {
+                .container { padding: 24px 18px; }
+                .cancel-icon { width: 60px; height: 60px; }
+                .cancel-icon svg { width: 30px; height: 30px; }
             }
         </style>
     </head>
@@ -483,9 +604,11 @@ app.get('/', (req, res) => {
     <html>
     <head>
         <title>Bot Webhook Server</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body { font-family: Arial; text-align: center; padding: 50px; background: #0a0a0a; color: white; }
+            body { font-family: Arial; text-align: center; padding: 50px 20px; background: #0a0a0a; color: white; }
             .status { color: #00ff88; font-size: 24px; }
+            @media (max-width: 480px) { body { padding: 30px 15px; } .status { font-size: 20px; } }
         </style>
     </head>
     <body>
