@@ -96,24 +96,33 @@ app.get('/payment/success', (req, res) => {
                 font-weight: 600;
                 margin-bottom: 20px;
             }
-            .claim-btn {
-                display: inline-block;
-                background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
-                color: #000;
-                padding: 15px 40px;
-                border-radius: 25px;
-                text-decoration: none;
-                font-weight: 700;
-                font-size: 18px;
-                transition: all 0.3s;
-                animation: pulse 2s infinite;
+            .loading-container {
+                margin: 25px 0;
             }
-            .claim-btn:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 15px 30px rgba(0,255,136,0.3);
+            .loading-bar {
+                width: 100%;
+                height: 6px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 10px;
+                overflow: hidden;
+                margin-top: 10px;
             }
-            .auto-redirect { color: #666; margin-top: 20px; font-size: 12px; }
-            .countdown { color: #00ff88; font-weight: 600; }
+            .loading-progress {
+                height: 100%;
+                width: 0%;
+                background: linear-gradient(90deg, #00ff88, #00cc6a);
+                border-radius: 10px;
+                transition: width 0.3s ease;
+            }
+            .redirect-text {
+                color: #888;
+                font-size: 14px;
+                margin-top: 10px;
+            }
+            .redirect-text span {
+                color: #00ff88;
+                font-weight: 600;
+            }
             @keyframes scaleIn {
                 from { transform: scale(0); }
                 to { transform: scale(1); }
@@ -136,22 +145,43 @@ app.get('/payment/success', (req, res) => {
             <h1 class="title">Payment Successful!</h1>
             <div class="amount-display">৳${amount}</div>
             <p class="subtitle">Amount has been added to your balance</p>
-            <a href="${botLink}" class="claim-btn">🎉 CLAIM BALANCE</a>
-            <p class="auto-redirect">Auto redirect in <span class="countdown" id="countdown">10</span> seconds...</p>
+            
+            <div class="loading-container">
+                <div class="loading-bar">
+                    <div class="loading-progress" id="loadingProgress"></div>
+                </div>
+                <p class="redirect-text">
+                    ⏳ Redirecting to bot in <span id="countdown">10</span> seconds...
+                </p>
+            </div>
         </div>
         
         <script>
             document.addEventListener('contextmenu', e => e.preventDefault());
             document.addEventListener('copy', e => e.preventDefault());
             
+            const botLink = '${botLink}';
             let countdown = 10;
             const countdownEl = document.getElementById('countdown');
+            const progressEl = document.getElementById('loadingProgress');
             
-            setInterval(() => {
+            // Progress bar update function
+            function updateProgress() {
+                const progress = ((10 - countdown) / 10) * 100;
+                progressEl.style.width = progress + '%';
+            }
+            
+            // Initial progress
+            updateProgress();
+            
+            const interval = setInterval(() => {
                 countdown--;
                 if (countdownEl) countdownEl.textContent = countdown;
+                updateProgress();
+                
                 if (countdown <= 0) {
-                    window.location.href = '${botLink}';
+                    clearInterval(interval);
+                    window.location.href = botLink;
                 }
             }, 1000);
         </script>
@@ -169,9 +199,6 @@ app.post('/payment/success', (req, res) => {
     const reference = metadata.reference || req.body.reference || '';
     const user_id = metadata.user_id || req.body.user_id || '';
     const amount = metadata.amount || req.body.amount || '';
-    
-    // !!! আপনার বটের ইউজারনেম দিয়ে পরিবর্তন করুন !!!
-    const botLink = `https://t.me/CraftlandXfollowersBot?start=${reference}`;
     
     res.json({ 
         status: 'success', 
@@ -309,5 +336,4 @@ app.get('/', (req, res) => {
 });
 
 // ==================== VERCEL EXPORT ====================
-// Vercel-এর জন্য app এক্সপোর্ট করুন
 module.exports = app;
