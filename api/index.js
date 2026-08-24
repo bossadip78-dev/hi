@@ -1,4 +1,4 @@
-// api/index.js - Vercel Serverless Function (Mobile + PC Optimized)
+// api/index.js - Vercel Serverless Function (Final Version)
 const express = require('express');
 const app = express();
 app.use(express.json());
@@ -13,21 +13,25 @@ app.get('/health', (req, res) => {
 
 // ==================== PAYMENT SUCCESS - GET ====================
 app.get('/payment/success', (req, res) => {
-    const paymentKey = req.query.paymentkey || req.query.payment_key || req.query.key;
-    const reference = req.query.reference || req.query.ref || '';
+    // শুধু paymentkey, user_id, amount নিন (reference বাদ)
+    const paymentKey = req.query.paymentkey || req.query.payment_key || req.query.key || '';
     const user_id = req.query.user_id || req.query.uid || '';
     const amount = req.query.amount || req.query.amt || '';
-    
-    // Order ID extract from reference
-    const orderId = reference ? reference.split('_')[1] || reference : 'N/A';
-    
-    const botLink = `https://t.me/CraftlandXfollowersBot?start=${reference}`;
-    
-    console.log('✅ Payment Success (GET):', paymentKey);
-    console.log('🔗 Reference:', reference);
-    console.log('👤 User:', user_id);
-    console.log('💰 Amount:', amount);
-    
+
+    console.log('✅ Payment Success (GET):', { paymentKey, user_id, amount });
+
+    // বট লিংক তৈরি (শুধু paymentKey দিয়ে)
+    const botLink = `https://t.me/CraftlandXfollowersBot?start=verify_${paymentKey}`;
+
+    // Order ID বের করুন (paymentKey থেকে অংশ নিন)
+    let orderId = 'N/A';
+    if (paymentKey) {
+        const parts = paymentKey.split('_');
+        if (parts.length > 1) {
+            orderId = parts[1] || paymentKey;
+        }
+    }
+
     res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -36,12 +40,7 @@ app.get('/payment/success', (req, res) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>Payment Successful - ৳${amount}</title>
         <style>
-            /* ===== RESET & BASE ===== */
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
                 background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
@@ -55,8 +54,6 @@ app.get('/payment/success', (req, res) => {
                 user-select: none;
                 -webkit-tap-highlight-color: transparent;
             }
-            
-            /* ===== CONTAINER ===== */
             .container {
                 background: rgba(255,255,255,0.05);
                 border: 1px solid rgba(255,255,255,0.08);
@@ -69,8 +66,6 @@ app.get('/payment/success', (req, res) => {
                 -webkit-backdrop-filter: blur(12px);
                 box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             }
-            
-            /* ===== CHECKMARK ICON ===== */
             .checkmark {
                 width: 72px;
                 height: 72px;
@@ -83,12 +78,7 @@ app.get('/payment/success', (req, res) => {
                 animation: scaleIn 0.5s ease;
                 flex-shrink: 0;
             }
-            .checkmark svg {
-                width: 36px;
-                height: 36px;
-            }
-            
-            /* ===== TYPOGRAPHY ===== */
+            .checkmark svg { width: 36px; height: 36px; }
             .status-badge {
                 display: inline-block;
                 background: rgba(0,255,136,0.12);
@@ -124,8 +114,6 @@ app.get('/payment/success', (req, res) => {
                 font-size: clamp(13px, 2.5vw, 15px);
                 margin-bottom: 20px;
             }
-            
-            /* ===== DETAILS BOX ===== */
             .details-box {
                 background: rgba(255,255,255,0.04);
                 border-radius: 14px;
@@ -142,13 +130,8 @@ app.get('/payment/success', (req, res) => {
                 border-bottom: 1px solid rgba(255,255,255,0.05);
                 gap: 12px;
             }
-            .detail-row:last-child {
-                border-bottom: none;
-                padding-bottom: 0;
-            }
-            .detail-row:first-child {
-                padding-top: 0;
-            }
+            .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+            .detail-row:first-child { padding-top: 0; }
             .detail-label {
                 color: #888;
                 font-size: clamp(12px, 2vw, 13px);
@@ -177,11 +160,7 @@ app.get('/payment/success', (req, res) => {
             .detail-value.user-id { color: #00ff88; }
             .detail-value.amount { color: #FFD700; }
             .detail-value.order-id { color: #88ccff; }
-            
-            /* ===== LOADING BAR ===== */
-            .loading-container {
-                margin: 6px 0 4px 0;
-            }
+            .loading-container { margin: 6px 0 4px 0; }
             .loading-bar {
                 width: 100%;
                 height: 4px;
@@ -201,12 +180,7 @@ app.get('/payment/success', (req, res) => {
                 font-size: clamp(12px, 2vw, 13px);
                 margin-top: 10px;
             }
-            .redirect-text span {
-                color: #00ff88;
-                font-weight: 600;
-            }
-            
-            /* ===== FOOTER ===== */
+            .redirect-text span { color: #00ff88; font-weight: 600; }
             .footer {
                 margin-top: 22px;
                 padding-top: 16px;
@@ -232,133 +206,31 @@ app.get('/payment/success', (req, res) => {
                 50% { opacity: 0.2; transform: scale(0.7); }
                 100% { opacity: 1; transform: scale(1); }
             }
-            .footer-text {
-                color: #666;
-                font-size: clamp(11px, 2vw, 13px);
-                font-weight: 500;
-                letter-spacing: 0.3px;
-            }
-            .footer-text span {
-                color: #00ff88;
-                font-weight: 600;
-            }
-            
-            /* ===== ANIMATIONS ===== */
             @keyframes scaleIn {
                 from { transform: scale(0); opacity: 0; }
                 to { transform: scale(1); opacity: 1; }
-            }
-            
-            /* ===== RESPONSIVE TWEAKS ===== */
-            @media (max-width: 480px) {
-                .container {
-                    padding: 24px 18px;
-                    border-radius: 20px;
-                }
-                .checkmark {
-                    width: 60px;
-                    height: 60px;
-                    margin-bottom: 16px;
-                }
-                .checkmark svg {
-                    width: 30px;
-                    height: 30px;
-                }
-                .details-box {
-                    padding: 14px 14px;
-                    margin-bottom: 18px;
-                }
-                .detail-row {
-                    padding: 6px 0;
-                }
-                .footer {
-                    margin-top: 18px;
-                    padding-top: 14px;
-                }
-                .green-dot {
-                    width: 7px;
-                    height: 7px;
-                }
-            }
-            
-            @media (max-width: 380px) {
-                .container {
-                    padding: 18px 14px;
-                }
-                .detail-label {
-                    font-size: 11px;
-                }
-                .detail-value {
-                    font-size: 11px;
-                }
-                .detail-label svg {
-                    width: 14px;
-                    height: 14px;
-                }
-            }
-            
-            /* ===== LANDSCAPE MODE ===== */
-            @media (max-height: 600px) and (orientation: landscape) {
-                body {
-                    padding: 12px;
-                }
-                .container {
-                    padding: 18px 20px;
-                    max-width: 380px;
-                }
-                .checkmark {
-                    width: 48px;
-                    height: 48px;
-                    margin-bottom: 12px;
-                }
-                .checkmark svg {
-                    width: 24px;
-                    height: 24px;
-                }
-                .amount-display {
-                    font-size: 30px;
-                    margin: 4px 0 10px 0;
-                }
-                .details-box {
-                    padding: 10px 14px;
-                    margin-bottom: 12px;
-                }
-                .detail-row {
-                    padding: 4px 0;
-                }
-                .footer {
-                    margin-top: 12px;
-                    padding-top: 10px;
-                }
-                .subtitle {
-                    margin-bottom: 12px;
-                    font-size: 12px;
-                }
             }
         </style>
     </head>
     <body oncontextmenu="return false;">
         <div class="container">
-            <!-- Success Icon -->
             <div class="checkmark">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
             </div>
-            
             <div class="status-badge">Payment Verified</div>
             <h1 class="title">Payment Successful!</h1>
             <div class="amount-display">৳${amount}</div>
             <p class="subtitle">Amount has been added to your balance</p>
             
-            <!-- Payment Details -->
             <div class="details-box">
                 <div class="detail-row">
                     <span class="detail-label">
                         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5.3 18.3C6.8 16.5 9.2 15 12 15s5.2 1.5 6.7 3.3"/></svg>
                         User ID
                     </span>
-                    <span class="detail-value user-id">${user_id || 'N/A'}</span>
+                    <span class="detail-value user-id">${user_id}</span>
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">
@@ -376,7 +248,6 @@ app.get('/payment/success', (req, res) => {
                 </div>
             </div>
             
-            <!-- Loading Bar -->
             <div class="loading-container">
                 <div class="loading-bar">
                     <div class="loading-progress" id="loadingProgress"></div>
@@ -386,7 +257,6 @@ app.get('/payment/success', (req, res) => {
                 </p>
             </div>
             
-            <!-- Footer -->
             <div class="footer">
                 <span class="green-dot"></span>
                 <span class="footer-text"><span>Jubayer</span> Secure Checkout</span>
@@ -431,21 +301,19 @@ app.post('/payment/success', (req, res) => {
     
     const paymentKey = req.body.paymentkey || req.body.payment_key || req.body.key;
     const metadata = req.body.metadata || {};
-    const reference = metadata.reference || req.body.reference || '';
     const user_id = metadata.user_id || req.body.user_id || '';
     const amount = metadata.amount || req.body.amount || '';
-    
+
     res.json({ 
         status: 'success', 
         message: 'Payment received',
-        data: { paymentKey, user_id, amount, reference }
+        data: { paymentKey, user_id, amount }
     });
 });
 
 // ==================== PAYMENT CANCEL ====================
 app.get('/payment/cancel', (req, res) => {
     console.log('❌ Payment Cancelled (GET)');
-    
     res.send(`
     <!DOCTYPE html>
     <html lang="en">
@@ -523,9 +391,7 @@ app.get('/payment/cancel', (req, res) => {
                 transition: all 0.3s;
                 -webkit-tap-highlight-color: transparent;
             }
-            .bot-btn:active {
-                transform: scale(0.95);
-            }
+            .bot-btn:active { transform: scale(0.95); }
             .footer {
                 margin-top: 22px;
                 padding-top: 16px;
@@ -562,11 +428,6 @@ app.get('/payment/cancel', (req, res) => {
                 from { transform: scale(0); opacity: 0; }
                 to { transform: scale(1); opacity: 1; }
             }
-            @media (max-width: 480px) {
-                .container { padding: 24px 18px; }
-                .cancel-icon { width: 60px; height: 60px; }
-                .cancel-icon svg { width: 30px; height: 30px; }
-            }
         </style>
     </head>
     <body>
@@ -581,7 +442,6 @@ app.get('/payment/cancel', (req, res) => {
             <h1 class="title">Payment Cancelled</h1>
             <p class="subtitle">No charges were made. You can try again anytime.</p>
             <a href="https://t.me/CraftlandXfollowersBot" class="bot-btn">Return to Bot</a>
-            
             <div class="footer">
                 <span class="green-dot"></span>
                 <span class="footer-text"><span>Jubayer</span> Secure Checkout</span>
@@ -603,12 +463,11 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Bot Webhook Server</title>
+        <title>Jubayer bot Server</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             body { font-family: Arial; text-align: center; padding: 50px 20px; background: #0a0a0a; color: white; }
             .status { color: #00ff88; font-size: 24px; }
-            @media (max-width: 480px) { body { padding: 30px 15px; } .status { font-size: 20px; } }
         </style>
     </head>
     <body>
