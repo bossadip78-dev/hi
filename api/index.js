@@ -13,24 +13,24 @@ app.get('/health', (req, res) => {
 
 // ==================== PAYMENT SUCCESS - GET ====================
 app.get('/payment/success', (req, res) => {
-    // শুধু paymentkey, user_id, amount নিন (reference বাদ)
     const paymentKey = req.query.paymentkey || req.query.payment_key || req.query.key || '';
     const user_id = req.query.user_id || req.query.uid || '';
     const amount = req.query.amount || req.query.amt || '';
 
     console.log('✅ Payment Success (GET):', { paymentKey, user_id, amount });
 
-    // বট লিংক তৈরি (শুধু paymentKey দিয়ে)
-    const botLink = `https://t.me/CraftlandXfollowersBot?start=verify_${paymentKey}`;
-
-    // Order ID বের করুন (paymentKey থেকে অংশ নিন)
+    // ✅ Order ID বের করার নতুন নিয়ম
     let orderId = 'N/A';
     if (paymentKey) {
-        const parts = paymentKey.split('_');
-        if (parts.length > 1) {
-            orderId = parts[1] || paymentKey;
+        if (paymentKey.includes('_')) {
+            const parts = paymentKey.split('_');
+            orderId = parts.length > 1 ? parts[1] : paymentKey;
+        } else {
+            orderId = paymentKey;
         }
     }
+
+    const botLink = `https://t.me/CraftlandXfollowersBot?start=verify_${paymentKey}`;
 
     res.send(`
     <!DOCTYPE html>
@@ -253,7 +253,7 @@ app.get('/payment/success', (req, res) => {
                     <div class="loading-progress" id="loadingProgress"></div>
                 </div>
                 <p class="redirect-text">
-                    Redirecting to bot in <span id="countdown">8</span> seconds...
+                    Redirecting to bot in <span id="countdown">3</span> seconds...
                 </p>
             </div>
             
@@ -268,12 +268,12 @@ app.get('/payment/success', (req, res) => {
             document.addEventListener('copy', e => e.preventDefault());
             
             const botLink = '${botLink}';
-            let countdown = 8;
+            let countdown = 3;
             const countdownEl = document.getElementById('countdown');
             const progressEl = document.getElementById('loadingProgress');
             
             function updateProgress() {
-                const progress = ((8 - countdown) / 8) * 100;
+                const progress = ((3 - countdown) / 3) * 100;
                 progressEl.style.width = progress + '%';
             }
             
@@ -298,17 +298,7 @@ app.get('/payment/success', (req, res) => {
 // ==================== PAYMENT SUCCESS - POST ====================
 app.post('/payment/success', (req, res) => {
     console.log('✅ Payment Success (POST):', JSON.stringify(req.body, null, 2));
-    
-    const paymentKey = req.body.paymentkey || req.body.payment_key || req.body.key;
-    const metadata = req.body.metadata || {};
-    const user_id = metadata.user_id || req.body.user_id || '';
-    const amount = metadata.amount || req.body.amount || '';
-
-    res.json({ 
-        status: 'success', 
-        message: 'Payment received',
-        data: { paymentKey, user_id, amount }
-    });
+    res.json({ status: 'success', message: 'Payment received' });
 });
 
 // ==================== PAYMENT CANCEL ====================
@@ -463,7 +453,7 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Jubayer bot Server</title>
+        <title>Bot Webhook Server</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             body { font-family: Arial; text-align: center; padding: 50px 20px; background: #0a0a0a; color: white; }
